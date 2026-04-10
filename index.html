@@ -347,6 +347,31 @@ body {
 
 /* Dashboard */
 .dashboard-header { padding: 40px 24px 24px; border-bottom: 1px solid rgba(26, 20, 16, 0.1); }
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 6px 14px;
+  background: rgba(30, 77, 58, 0.08);
+  border: 1px solid rgba(30, 77, 58, 0.2);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  font-weight: 600;
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -572,6 +597,10 @@ footer p { font-size: 11px; color: rgba(26, 20, 16, 0.5); letter-spacing: 0.1em;
       Senarai <span style="color: var(--emerald);">Pendaftaran</span>
     </h1>
     <p style="font-size: 14px; color: rgba(26,20,16,0.6); margin-top: 8px;">Majlis Eratan Silaturrahim Aidilfitri MADANI · 16 April 2026</p>
+    <div class="live-indicator">
+      <span id="live-dot" class="live-dot"></span>
+      <span id="live-text">Memuatkan...</span>
+    </div>
   </header>
 
   <section class="container" style="padding: 40px 24px 80px;">
@@ -620,10 +649,17 @@ footer p { font-size: 11px; color: rgba(26, 20, 16, 0.5); letter-spacing: 0.1em;
 </footer>
 
 <script>
+// ============================================================
+// CONFIGURATION — GANTI URL INI DENGAN APPS SCRIPT WEB APP URL
+// ============================================================
+const GAS_URL = "https://script.google.com/macros/s/AKfycby9XV09vmrLqyoievg_U-9W1ZWN_mpha7SDLmc_UASx_WWMp6xQixAWZr89euDIMGU/exec";
+const REFRESH_INTERVAL = 5000; // refresh dashboard setiap 5 saat
+
 // =========== STATE ===========
-let pendaftaran = JSON.parse(localStorage.getItem('pendaftaran-aidilfitri') || '[]');
+let pendaftaran = [];
 let resitData = null;
 let resitFileName = '';
+let refreshTimer = null;
 
 // =========== NAVIGATION ===========
 function showPage(page) {
@@ -633,17 +669,63 @@ function showPage(page) {
   document.getElementById('tab-form').classList.remove('active');
   document.getElementById('tab-dashboard').classList.remove('active');
 
+  // Stop auto-refresh when leaving dashboard
+  if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+
   if (page === 'form') {
     document.getElementById('page-form').classList.remove('hidden');
     document.getElementById('tab-form').classList.add('active');
   } else if (page === 'dashboard') {
     document.getElementById('page-dashboard').classList.remove('hidden');
     document.getElementById('tab-dashboard').classList.add('active');
-    renderTable();
+    fetchData();
+    refreshTimer = setInterval(fetchData, REFRESH_INTERVAL);
   } else if (page === 'success') {
     document.getElementById('page-success').classList.remove('hidden');
   }
   window.scrollTo(0, 0);
+}
+
+// =========== FETCH DATA FROM GAS ===========
+async function fetchData() {
+  if (!GAS_URL || GAS_URL.indexOf('GANTIKAN') === 0) {
+    showLoadError('Apps Script URL belum dikonfigurasi dalam fail HTML.');
+    return;
+  }
+  try {
+    const res = await fetch(GAS_URL + '?action=list&t=' + Date.now());
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Gagal memuatkan data');
+    pendaftaran = data.data || [];
+    renderTable();
+    updateLiveIndicator(true);
+  } catch (err) {
+    console.error('Fetch error:', err);
+    updateLiveIndicator(false);
+    showLoadError(err.message);
+  }
+}
+
+function updateLiveIndicator(ok) {
+  const dot = document.getElementById('live-dot');
+  const text = document.getElementById('live-text');
+  if (!dot) return;
+  if (ok) {
+    dot.style.background = '#1e4d3a';
+    text.textContent = 'Live · Auto-refresh setiap 5 saat';
+  } else {
+    dot.style.background = '#b8593a';
+    text.textContent = 'Sambungan terganggu — cuba lagi...';
+  }
+}
+
+function showLoadError(msg) {
+  const empty = document.getElementById('empty-state');
+  if (empty && pendaftaran.length === 0) {
+    empty.classList.remove('hidden');
+    empty.innerHTML = '<p style="color: var(--clay); font-weight: 600; margin-bottom: 8px;">Gagal memuatkan data</p><p style="font-size: 12px;">' + escapeHtml(msg) + '</p>';
+    document.querySelector('#table-wrap table').style.display = 'none';
+  }
 }
 
 // =========== FILE UPLOAD ===========
@@ -675,7 +757,7 @@ function showError(msg) {
 }
 
 // =========== FORM SUBMIT ===========
-document.getElementById('reg-form').addEventListener('submit', function(e) {
+document.getElementById('reg-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   const namaAnak = document.getElementById('namaAnak').value.trim();
   const namaPenjaga = document.getElementById('namaPenjaga').value.trim();
@@ -690,19 +772,40 @@ document.getElementById('reg-form').addEventListener('submit', function(e) {
     showError('Sila muat naik resit pembayaran RM30.00.');
     return;
   }
+  if (!GAS_URL || GAS_URL.indexOf('GANTIKAN') === 0) {
+    showError('Sistem belum dikonfigurasi. Sila hubungi pentadbir.');
+    return;
+  }
 
-  pendaftaran.push({
-    namaAnak,
-    namaPenjaga,
-    noTelefon,
-    kelas,
-    jumlah: 30,
-    resit: resitData,
-    resitName: resitFileName,
-    tarikh: new Date().toISOString()
-  });
-  localStorage.setItem('pendaftaran-aidilfitri', JSON.stringify(pendaftaran));
-  showPage('success');
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Menghantar...';
+
+  try {
+    // Use text/plain to avoid CORS preflight to Apps Script
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'register',
+        payload: {
+          namaAnak, namaPenjaga, noTelefon, kelas,
+          jumlah: 30,
+          resit: resitData,
+          resitName: resitFileName
+        }
+      })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Pendaftaran gagal');
+    showPage('success');
+  } catch (err) {
+    console.error(err);
+    showError('Pendaftaran gagal: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Hantar Pendaftaran';
+  }
 });
 
 function resetForm() {
@@ -718,12 +821,12 @@ function resetForm() {
 function renderTable() {
   const search = (document.getElementById('search').value || '').toLowerCase();
   const filtered = pendaftaran.filter(p =>
-    p.namaAnak.toLowerCase().includes(search) ||
-    p.kelas.toLowerCase().includes(search)
+    (p.namaAnak || '').toLowerCase().includes(search) ||
+    (p.kelas || '').toLowerCase().includes(search)
   );
 
   const total = pendaftaran.reduce((s, p) => s + Number(p.jumlah || 0), 0);
-  const kelasSet = new Set(pendaftaran.map(p => p.kelas));
+  const kelasSet = new Set(pendaftaran.map(p => p.kelas).filter(Boolean));
 
   document.getElementById('stat-peserta').textContent = pendaftaran.length;
   document.getElementById('stat-kutipan').textContent = 'RM ' + total.toFixed(2);
@@ -753,7 +856,7 @@ function renderTable() {
 }
 
 function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 </script>
 </body>
