@@ -434,6 +434,189 @@ tfoot td.amount { font-family: 'Cormorant Garamond', serif; font-size: 24px; }
 
 .empty-state { padding: 60px 24px; text-align: center; color: rgba(26, 20, 16, 0.5); }
 
+/* Clickable name */
+.name-link {
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(26, 20, 16, 0.3);
+  transition: all 0.2s;
+}
+.name-link:hover {
+  color: var(--emerald);
+  border-bottom-color: var(--emerald);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 48, 36, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 0.25s ease-out;
+}
+.modal-overlay.show { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-box {
+  background: var(--cream);
+  max-width: 1100px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  border: 1px solid rgba(201, 166, 97, 0.4);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.35s ease-out;
+  position: relative;
+}
+
+.modal-header {
+  padding: 32px 40px 20px;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  background: linear-gradient(135deg, rgba(201, 166, 97, 0.06), transparent);
+}
+.modal-header .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--clay);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.modal-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.modal-close {
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.modal-close:hover {
+  background: var(--clay);
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 32px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 40px;
+}
+@media (max-width: 768px) {
+  .modal-body { grid-template-columns: 1fr; padding: 24px; gap: 28px; }
+  .modal-header { padding: 24px; }
+  .modal-header h2 { font-size: 26px; }
+}
+
+.detail-list { }
+.detail-item {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.08);
+}
+.detail-item:last-child { border-bottom: none; }
+.detail-item .detail-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(26, 20, 16, 0.5);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.detail-item .detail-value {
+  font-size: 17px;
+  color: var(--ink);
+  font-weight: 500;
+  word-break: break-word;
+}
+.detail-item .detail-value.big {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-style: italic;
+  color: var(--emerald);
+  font-weight: 600;
+}
+.detail-item .detail-value.phone {
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+.resit-section { }
+.resit-section .resit-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(26, 20, 16, 0.5);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.resit-frame {
+  background: white;
+  border: 1px solid rgba(26, 20, 16, 0.15);
+  padding: 16px;
+  text-align: center;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.resit-frame img {
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+.resit-frame .no-resit {
+  color: rgba(26, 20, 16, 0.4);
+  font-size: 13px;
+  font-style: italic;
+}
+.resit-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--emerald);
+  text-decoration: none;
+  border-bottom: 1px solid var(--emerald);
+  letter-spacing: 0.05em;
+}
+
+.modal-footer {
+  padding: 20px 40px 32px;
+  border-top: 1px solid rgba(26, 20, 16, 0.1);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+@media (max-width: 768px) {
+  .modal-footer { padding: 20px 24px 28px; }
+}
+
 footer {
   border-top: 1px solid rgba(26, 20, 16, 0.1);
   padding: 32px 24px;
@@ -644,6 +827,60 @@ footer p { font-size: 11px; color: rgba(26, 20, 16, 0.5); letter-spacing: 0.1em;
   </section>
 </div>
 
+<!-- ============ MODAL DETAIL ============ -->
+<div id="detail-modal" class="modal-overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <p class="eyebrow">Butiran Peserta</p>
+        <h2 id="modal-nama-anak">—</h2>
+      </div>
+      <button class="modal-close" onclick="closeDetail()" aria-label="Tutup">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-list">
+        <div class="detail-item">
+          <p class="detail-label">Nama Anak</p>
+          <p class="detail-value" id="modal-nama"></p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Nama Ibu Bapa / Penjaga</p>
+          <p class="detail-value" id="modal-penjaga"></p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">No. Telefon Penjaga</p>
+          <p class="detail-value phone" id="modal-telefon"></p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Kelas</p>
+          <p class="detail-value"><span class="kelas-badge" id="modal-kelas" style="font-size: 13px; padding: 6px 14px;"></span></p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Jumlah Bayaran</p>
+          <p class="detail-value big" id="modal-jumlah"></p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Tarikh Daftar</p>
+          <p class="detail-value" id="modal-tarikh" style="font-size: 14px; color: rgba(26,20,16,0.7);"></p>
+        </div>
+      </div>
+
+      <div class="resit-section">
+        <p class="resit-label">Resit Pembayaran</p>
+        <div class="resit-frame" id="modal-resit-frame">
+          <p class="no-resit">Tiada resit dimuat naik</p>
+        </div>
+        <a id="modal-resit-link" class="resit-link" href="#" target="_blank" rel="noopener" style="display:none;">Buka resit dalam tab baru ↗</a>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary btn-dark" onclick="closeDetail()">← Kembali ke Senarai</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <p>Task Force PPKI SK Seri Intan · Kluang 2026</p>
 </footer>
@@ -652,7 +889,7 @@ footer p { font-size: 11px; color: rgba(26, 20, 16, 0.5); letter-spacing: 0.1em;
 // ============================================================
 // CONFIGURATION — GANTI URL INI DENGAN APPS SCRIPT WEB APP URL
 // ============================================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycby9XV09vmrLqyoievg_U-9W1ZWN_mpha7SDLmc_UASx_WWMp6xQixAWZr89euDIMGU/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzlHRd1Vj8Rl6HtzbkZNpFMK0QdIrr1YDVLnGTpmNF0LxGpit_EvTTfR5_rh4OiW04/exec";
 const REFRESH_INTERVAL = 5000; // refresh dashboard setiap 5 saat
 
 // =========== STATE ===========
@@ -844,16 +1081,74 @@ function renderTable() {
   } else {
     table.style.display = '';
     empty.classList.add('hidden');
+    // Store filtered list globally so modal can find by index
+    window._filteredList = filtered;
     tbody.innerHTML = filtered.map((p, i) => `
       <tr>
         <td class="num">${String(i + 1).padStart(3, '0')}</td>
-        <td style="font-weight: 500;">${escapeHtml(p.namaAnak)}</td>
+        <td><a class="name-link" onclick="openDetail(${i})">${escapeHtml(p.namaAnak)}</a></td>
         <td><span class="kelas-badge">${escapeHtml(p.kelas)}</span></td>
         <td class="amount">RM ${Number(p.jumlah).toFixed(2)}</td>
       </tr>
     `).join('');
   }
 }
+
+// =========== DETAIL MODAL ===========
+function openDetail(idx) {
+  const p = window._filteredList[idx];
+  if (!p) return;
+
+  document.getElementById('modal-nama-anak').textContent = p.namaAnak || '—';
+  document.getElementById('modal-nama').textContent = p.namaAnak || '—';
+  document.getElementById('modal-penjaga').textContent = p.namaPenjaga || '—';
+  document.getElementById('modal-telefon').textContent = p.noTelefon || '—';
+  document.getElementById('modal-kelas').textContent = p.kelas || '—';
+  document.getElementById('modal-jumlah').textContent = 'RM ' + Number(p.jumlah || 0).toFixed(2);
+
+  // Format tarikh
+  let tarikhText = '—';
+  if (p.tarikh) {
+    try {
+      const d = new Date(p.tarikh);
+      const months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogos','Sep','Okt','Nov','Dis'];
+      tarikhText = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() +
+        ', ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    } catch (e) { tarikhText = String(p.tarikh); }
+  }
+  document.getElementById('modal-tarikh').textContent = tarikhText;
+
+  // Resit
+  const frame = document.getElementById('modal-resit-frame');
+  const link = document.getElementById('modal-resit-link');
+  if (p.resitUrl && p.resitUrl.indexOf('http') === 0) {
+    // Convert Drive URL to direct preview
+    let imgSrc = p.resitUrl;
+    const driveMatch = p.resitUrl.match(/[-\w]{25,}/);
+    if (driveMatch) {
+      imgSrc = 'https://drive.google.com/thumbnail?id=' + driveMatch[0] + '&sz=w1000';
+    }
+    frame.innerHTML = '<img src="' + imgSrc + '" alt="Resit" onclick="window.open(\'' + p.resitUrl + '\',\'_blank\')" onerror="this.parentElement.innerHTML=\'<p class=&quot;no-resit&quot;>Tidak dapat memaparkan resit. Klik link di bawah.</p>\'">';
+    link.href = p.resitUrl;
+    link.style.display = 'inline-block';
+  } else {
+    frame.innerHTML = '<p class="no-resit">Tiada resit dimuat naik</p>';
+    link.style.display = 'none';
+  }
+
+  document.getElementById('detail-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('detail-modal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ESC key to close modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDetail();
+});
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
